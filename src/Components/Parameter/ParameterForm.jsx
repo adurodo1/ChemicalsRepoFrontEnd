@@ -4,16 +4,63 @@ import {useNavigate} from 'react-router-dom';
 import io from "socket.io-client";//import socket io
 
  const ParameterForm = (props) => {
+
+  const [userName, setName] = useState("");
+  const [ph, setPh] = useState("");
+  const [ppm, setPpm] = useState("");
+  const [comment, setComment] = useState("");
+
+  var alertArray=["PPm value is greater then 2 and Ph is greater than 11","PPm value is greater then 2 and Ph is less than 6.5",
+  "PPm value is greater then 2","Ph value is greater then 11","Ph value is less than 6.5"]
+
+  var statuscodeArray=["red","red","red","red","red"];
+  function alertDelegate(del,alertReportArray){
+    if(ppm >2 && ph >11)
+    {
+      del(alertReportArray[0])
+       
+    }
+    else if(ppm >2 && ph < 6.5)
+    {
+      del(alertReportArray[1])
+       
+    }
+
+    else if(ppm >2)
+    {
+      del(alertReportArray[2])
+       
+    }
+
+    
+    else if(ph >11)
+    {
+      del(alertReportArray[3])
+       
+    }
+
+    else if(ph <6.5)
+    {
+      del(alertReportArray[4])
+       
+    }
+
+  }
    
   const navigate = useNavigate();//use navigate to redirect
-  function submitParams(e){
+  async function submitParams(e){
     e.preventDefault();
-    const url = 'http://localhost:4000/parameters';
+    // const url = 'http://localhost:4000/parameters';
+    const url = 'https://parameterserver1.herokuapp.com/parameters';
+
+    var statuscode=alertDelegate(evalStatus,statuscodeArray);
+
     const data=  {
       name: userName,
       ppm: ppm,
       ph:ph,
-      cmt: comment
+      cmt: comment,
+      status:statuscode
   };
     const options = {
       method: 'POST',
@@ -27,41 +74,48 @@ import io from "socket.io-client";//import socket io
      
   
   
-    fetch(url, options)
+    await fetch(url, options)
     .then(navigate(''))
     ;
     //
 
-      //set email notifier for parameters that meet condition
-    const emailUrl='http://localhost:4000/sendEmail'
-    if(ppm >2)
-    {
-      const ppmdata=  {
-        name: userName,
-        ppm: ppm,
-        ph:ph
-     
-    };
+    function evalStatus(status){
+      return status;
 
-    const ppmoptions = {
-      method: 'POST',
-      body: JSON.stringify(ppmdata),
-      headers: {
-          'Content-Type': 'application/json'
-      }
-  }
-
-  fetch(emailUrl, ppmoptions)
-  .then(res => res.json())
-  ;
+    }
+    async function createAlerts(query){
+      {
+        const ppmdata=  {
+          name: userName,
+          ppm: ppm,
+          ph:ph,
+          query:query
        
+      };
+  
+      const ppmoptions = {
+        method: 'POST',
+        body: JSON.stringify(ppmdata),
+        headers: {
+            'Content-Type': 'application/json'
+        }
     }
   
+    await fetch(emailUrl, ppmoptions)
+    .then(res => res.json())
+    ;
+         
+      }
+    }
+
+    
+
+      //set email notifier for parameters that meet condition
+    const emailUrl='https://parameterserver1.herokuapp.com/sendEmail'
+    alertDelegate(createAlerts,alertArray);
+  
   }
-  const [userName, setName] = useState("");
-  const [ph, setPh] = useState("");
-  const [ppm, setPpm] = useState("");
-  const [comment, setComment] = useState("");
+
  
     return ( 
         <div>

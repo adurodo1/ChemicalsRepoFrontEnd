@@ -1,5 +1,5 @@
 //import logo from './logo.svg';
-import './App.css';
+ 
 import React,{useState,useEffect} from 'react';
 import { Alert } from 'react-bootstrap';
 import ParameterList from './Parameter/ParameterList';
@@ -33,7 +33,7 @@ function App() {
 useEffect( () => {
  
 setLoading(true)
-  fetch(`http://localhost:4000/parameters`, {
+  fetch(`https://parameterserver1.herokuapp.com/parameters`, {
     "method": "GET",
     headers: {
       'Content-Type': 'application/json'
@@ -52,7 +52,7 @@ const [alert, setAlert] = useState(null);
  
 // establish socket connection
  useEffect(() => {
-  setSocket(io('http://localhost:4000'));//io will return an io object
+  setSocket(io('https://parameterserver1.herokuapp.com/'));//io will return an io object
   console.log(socket);
 }, []);//automaticaaly runs on page load, behind the scenes
 
@@ -120,8 +120,9 @@ return null
         <Alert.Heading>Oh snap! You got an error!</Alert.Heading>
         <p>
           Parameter value exceed Limit.
-          
+          <p>Rationale for Error :{alert.query}</p> 
          <p>Entered by :{alert.name}</p> 
+        
          <p>PPm  :{alert.ppm}</p>
          <p>Ph by :{alert.ph}</p>
          

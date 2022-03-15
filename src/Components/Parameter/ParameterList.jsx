@@ -20,7 +20,7 @@ const ParameterList = (props) => {
 useEffect( () => {
  
 setLoading(true)
-  fetch(`http://localhost:4000/parameters`, {
+  fetch(`https://parameterserver1.herokuapp.com/parameters`, {
     "method": "GET",
     headers: {
       'Content-Type': 'application/json'
